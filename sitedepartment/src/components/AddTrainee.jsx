@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AddTrainee = () => {
+function AddTrainee() {
   const navigate = useNavigate();
   const [sites, setSites] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -13,12 +13,12 @@ const AddTrainee = () => {
     middle_name: "",
     last_name: "",
     email: "",
-    role: "Trainee",
-    access_level: "user", // ✅ added
+    access_level: "", 
     password: "",
     confirm_password: "",
     site_id: "",
-    department_id: ""
+    department_id: "",
+    role: "Trainee"
   });
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const AddTrainee = () => {
   };
 
   const handleCancel = () => {
-    navigate('/');
+    navigate('/', { state: { show: 'trainee' } });
   };
 
   return (
@@ -99,10 +99,10 @@ const AddTrainee = () => {
         <form onSubmit={handleSubmit}>
           {/* Name Fields */}
           <div className="form-row">
-            <div className="form-group">
+             <div className="form-group">
               <label>First Name *</label>
               <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} required />
-            </div>
+            </div> 
             <div className="form-group">
               <label>Middle Name</label>
               <input type="text" name="middle_name" value={formData.middle_name} onChange={handleChange} />
@@ -122,11 +122,11 @@ const AddTrainee = () => {
             <div className="form-group">
               <label>Access Level *</label>
               <select name="access_level" value={formData.access_level} onChange={handleChange} required>
-                <option value="user">Level 1</option>
-                <option value="manager">Level 2</option>
-                <option value="admin">Level 3</option>
-                <option value="admin">Level 4</option>
-                <option value="admin">Level 5</option>
+                <option value="Level 1">Level 1</option>
+                <option value="Level 2">Level 2</option>
+                <option value="Level 3">Level 3</option>
+                <option value="Level 4">Level 4</option>
+                <option value="Level 5">Level 5</option>
               </select>
             </div>
           </div>

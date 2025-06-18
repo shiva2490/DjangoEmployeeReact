@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import DeptAdminTable from './DeptAdminTable';
 import axios from "axios";
 
-const AddDeptAdmin = () => {
+function AddDeptAdmin() {
   const navigate = useNavigate();
   // const [sites, setSites] = useState([]);
   // const [departments, setDepartments] = useState([]);
@@ -71,9 +72,10 @@ const AddDeptAdmin = () => {
     }
   };
 
-  const handleCancel = () => {
-    navigate('/dept-admin');
-  };
+const handleCancel = () => {
+  // Navigate to HomePage and tell it to show SiteAdminTable
+  navigate('/', { state: { show: 'deptAdmin' } });
+};
 
   return (
     <div className="page-container">

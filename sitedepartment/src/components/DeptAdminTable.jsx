@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const DeptAdminTable = () => {
+function DeptAdminTable() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ const DeptAdminTable = () => {
   }, []);
 
   const fetchUsers = () => {
-    axios.get("http://localhost:8000/trainee/api/find/Dept%20Admin/")
+    axios.get("http://localhost:8000/trainee/api/find/Dept Admin/")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error("Error loading users:", err));
   };

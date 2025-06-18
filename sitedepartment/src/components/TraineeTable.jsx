@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const TraineeTable = () => {
+function TraineeTable() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 

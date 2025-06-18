@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-const AddSiteAdmin = () => {
+function AddSiteAdmin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -47,9 +47,10 @@ const AddSiteAdmin = () => {
     }
   };
 
-  const handleCancel = () => {
-    navigate('/site-admin');
-  };
+const handleCancel = () => {
+  // Navigate to HomePage and tell it to show SiteAdminTable
+  navigate('/', { state: { show: 'siteAdmin' } });
+};
 
   return (
     <div className="page-container">
@@ -71,9 +72,6 @@ const AddSiteAdmin = () => {
                 required
               />
             </div>
-            {/* <TextField/>
-            <TextField/>
-            <TextField/> */}
             <div className="form-group">
               <label htmlFor="middle_name">Middle Name</label>
               <input

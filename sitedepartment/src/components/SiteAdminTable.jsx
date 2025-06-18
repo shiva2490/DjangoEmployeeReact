@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const SiteAdminTable = () => {
+function SiteAdminTable() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ const SiteAdminTable = () => {
   }, []);
 
   const fetchUsers = () => {
-    axios.get("http://localhost:8000/trainee/api/find/Site%20Admin/")
+    axios.get("http://localhost:8000/trainee/api/find/Site Admin/")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error("Error loading users:", err));
   };

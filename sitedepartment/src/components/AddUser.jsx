@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AddUser = () => {
+function AddUser() {
   const navigate = useNavigate();
   const [sites, setSites] = useState([]);
   const [departments, setDepartments] = useState([]);
