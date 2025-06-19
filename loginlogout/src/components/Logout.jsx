@@ -9,7 +9,7 @@ function Logout() {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:8000/users/logout/",
+        "http://127.0.0.1:8000/users/logout/",
         {},
         // { withCredentials: true }  // Important to send session cookie
       );
@@ -25,7 +25,7 @@ function Logout() {
   return (
     <div>
       <h2>Logout Page</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <button type="button" onClick={handleLogout}>Logout</button>
     </div>
   );
 

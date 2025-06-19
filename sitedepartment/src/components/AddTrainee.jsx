@@ -66,14 +66,14 @@ function AddTrainee() {
       access_level: formData.access_level, // send access level
       password: formData.password,
       confirm_password: formData.confirm_password,
-      site_id: formData.site_id,
-      department_id: formData.department_id
+      site: formData.site_id,
+      department: formData.department_id
     };
 
     try {
       await axios.post("http://localhost:8000/trainee/api/save/", dataToSend);
       alert("User registered successfully!");
-      navigate('/');
+      navigate('/', { state: { show: 'trainee' } });
     } catch (err) {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)

@@ -73,8 +73,8 @@ function TraineeTable() {
                     {user.access_level}
                   </span>
                 </td>
-                <td>{user.site?.name || "—"}</td>
-                <td>{user.department?.name || "—"}</td>
+                <td>{user.site_name || "—"}</td>
+                <td>{user.department_name || "—"}</td>
                 <td>{user.role}</td>
                 <td className="action-cell">
                   <button 

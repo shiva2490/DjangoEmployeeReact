@@ -159,9 +159,9 @@ function EditUser() {
       alert("User updated successfully!");
       
       // Redirect to appropriate table
-      if (formData.role === "Site Admin") navigate('/site-admin');
-      else if (formData.role === "Dept Admin") navigate('/dept-admin');
-      else navigate('/trainee');
+      if (formData.role === "Site Admin") navigate('/', { state: { show: 'siteAdmin' } });
+      else if (formData.role === "Dept Admin") navigate('/', { state: { show: 'deptAdmin' } });
+      else navigate('/', { state: { show: 'trainee' } });
     } catch (err) {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
@@ -173,9 +173,9 @@ function EditUser() {
   };
 
   const handleCancel = () => {
-    if (formData.role === "Site Admin") navigate('/site-admin');
-    else if (formData.role === "Dept Admin") navigate('/dept-admin');
-    else navigate('/trainee');
+    if (formData.role === "Site Admin") navigate('/', { state: { show: 'siteAdmin' } });
+    else if (formData.role === "Dept Admin") navigate('/', { state: { show: 'deptAdmin' } });
+    else navigate('/', { state: { show: 'trainee' } });
   };
 
   // Get page title based on role

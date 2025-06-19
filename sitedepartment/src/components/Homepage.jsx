@@ -14,20 +14,21 @@ function HomePage() {
   const location = useLocation();
   const [activeTable, setActiveTable] = useState('users');
 
-  // useEffect(() => {
-  //   if (activeTable === 'users') {
-  //     fetchUsers();
-  //   }
-  // }, []);//activeTable]);
-
   useEffect(() => {
-  // Check if navigation has state passed (like from cancel button)
-  if (location.state?.show) {
-    setActiveTable(location.state.show); // Example: 'siteAdmin'
-  } else if (activeTable === 'users') {
-    fetchUsers(); // Only fetch if viewing All Users
-  }
-}, [location.state]);
+    // if (activeTable === 'allusers') {
+    {
+      fetchUsers();
+    }
+  }, []);//activeTable]);
+
+// useEffect(() => {
+//   if (location.state?.show) {
+//     setActiveTable(location.state.show);
+//   } else {
+//     setActiveTable('users');
+//   }
+// }, []);
+
 
 
   const fetchUsers = () => {

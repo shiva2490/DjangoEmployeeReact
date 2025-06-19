@@ -14,8 +14,9 @@ function Login() {
     try {
       // Sends login data to backend (Django API)
       const result = await axios.post(
-        "http://localhost:8000/users/login/", // Django login API
+        "http://127.0.0.1:8000/users/login/", // Django login API
         { username, password },
+        // {withCredentials : true}
       );
 
       // If login is successful
@@ -27,6 +28,7 @@ function Login() {
       console.error(err);
     }
   };
+  
 
   return (
     <>
@@ -51,6 +53,7 @@ function Login() {
         <br />
 
         <button type="submit">Login</button>
+        <button type="button" onClick={ () => navigate("/signup")}>Sign Up</button>
       </form>
     </>
   );

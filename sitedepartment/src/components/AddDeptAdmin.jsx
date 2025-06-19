@@ -61,7 +61,7 @@ function AddDeptAdmin() {
     try {
       await axios.post("http://localhost:8000/trainee/api/save/", formData);
       alert("Department Admin registered successfully!");
-      navigate('/dept-admin');
+      navigate('/', { state: { show: 'deptAdmin' } });
     } catch (err) {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)

@@ -36,7 +36,7 @@ function AddSiteAdmin() {
     try {
       await axios.post("http://localhost:8000/trainee/api/save/", formData);
       alert("Site Admin registered successfully!");
-      navigate('/site-admin');
+      navigate('/', { state: { show: 'siteAdmin' } });
     } catch (err) {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
