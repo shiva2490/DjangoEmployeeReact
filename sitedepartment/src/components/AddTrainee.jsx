@@ -122,6 +122,7 @@ function AddTrainee() {
             <div className="form-group">
               <label>Access Level *</label>
               <select name="access_level" value={formData.access_level} onChange={handleChange} required>
+                <option >--Select--</option>
                 <option value="Level 1">Level 1</option>
                 <option value="Level 2">Level 2</option>
                 <option value="Level 3">Level 3</option>

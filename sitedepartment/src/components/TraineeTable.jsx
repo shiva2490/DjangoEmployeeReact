@@ -68,11 +68,7 @@ function TraineeTable() {
                 <td>{user.middle_name || "—"}</td>
                 <td>{user.last_name}</td>
                 <td>{user.email}</td>
-                <td>
-                  <span className={`access-badge ${user.access_level}`}>
-                    {user.access_level}
-                  </span>
-                </td>
+                <td>{user.access_level}</td>
                 <td>{user.site_name || "—"}</td>
                 <td>{user.department_name || "—"}</td>
                 <td>{user.role}</td>

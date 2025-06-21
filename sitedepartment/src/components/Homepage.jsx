@@ -14,12 +14,17 @@ function HomePage() {
   const location = useLocation();
   const [activeTable, setActiveTable] = useState('users');
 
-  useEffect(() => {
-    // if (activeTable === 'allusers') {
-    {
-      fetchUsers();
-    }
-  }, []);//activeTable]);
+useEffect(() => {
+  const tableFromState = location.state?.show;
+  if (tableFromState) {
+    setActiveTable(tableFromState);  // read from navigation state
+  } else {
+    setActiveTable("users");         // default view
+  }
+
+  fetchUsers(); // still fetch all users for All Users table
+}, []);  //location.state
+
 
 // useEffect(() => {
 //   if (location.state?.show) {
@@ -95,11 +100,7 @@ function HomePage() {
                       <td>{user.middle_name || "—"}</td>
                       <td>{user.last_name}</td>
                       <td>{user.email}</td>
-                      <td>
-                        <span className={`access-badge ${user.access_level}`}>
-                          {user.access_level}
-                        </span>
-                      </td>
+                      <td>{user.access_level}</td>
                       <td>{user.site_name || "—"}</td>
                       <td>{user.department_name || "—"}</td>
                       <td>{user.role}</td>

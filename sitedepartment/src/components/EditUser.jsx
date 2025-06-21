@@ -9,7 +9,6 @@ function EditUser() {
   const [sites, setSites] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [userLoading, setUserLoading] = useState(true);
   const [userRole, setUserRole] = useState("");
 
   const [formData, setFormData] = useState({
@@ -20,13 +19,13 @@ function EditUser() {
     access_level: "",
     password: "",
     confirm_password: "",
-    site: "",
-    department: "",
+    site_id: "",        // Form uses site_id
+    department_id: "",  // Form uses department_id
     role: ""
   });
 
   useEffect(() => {
-    // Load sites for Dept Admin and Trainee
+    // Load sites for Trainee
     axios.get("http://localhost:8000/trainee/api/sites/")
       .then(res => setSites(res.data))
       .catch(err => console.error("Error loading sites:", err));
@@ -34,9 +33,16 @@ function EditUser() {
     // Check if user data was passed in state
     if (location.state?.user) {
       const user = location.state.user;
-      const role = location.state.role;
       
-      setUserRole(role);
+    console.log("=== DEBUGGING RECEIVED DATA ===");
+    console.log("Received user:", user);
+    console.log("Looking for site_id:", user.site_id);
+    console.log("Looking for department_id:", user.department_id);
+    console.log("Looking for site:", user.site);
+    console.log("Looking for department:", user.department);
+    console.log("==============================");
+
+      setUserRole(user.role);
       setFormData({
         first_name: user.first_name,
         middle_name: user.middle_name || "",
@@ -45,58 +51,57 @@ function EditUser() {
         access_level: user.access_level,
         password: "",
         confirm_password: "",
-        site: user.site_id || "",
-        department: user.department_id || "",
+        site_id: user.site || "",        // API returns 'site', map to 'site_id'
+        department_id: user.department || "", // API returns 'department', map to 'department_id'
         role: user.role
       });
 
-      if (user.site_id) {
-        fetchDepartmentsBySite(user.site_id);
+      // Load departments if site is selected
+      if (user.site) {
+        fetchDepartmentsBySite(user.site);
       }
-      setUserLoading(false);
-    } else {
-      // Fetch user by ID
-      fetchUserById(id);
-    }
-  }, [id, location.state]);
+    } 
+    // else {
+    //   // Fetch user by ID if no state data
+    //   fetchUserById(id);
+    // }
+  }, []); //id, location.state
 
-  const fetchUserById = async (userId) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/trainee/api/user/${userId}/`);
-      const user = response.data;
+  // const fetchUserById = async (userId) => {
+  //   try {
+  //     const response = await axios.get(`http://localhost:8000/trainee/api/user/${userId}/`);
+  //     const user = response.data;
       
-      // Determine role for UI and conditional rendering
-      const role = user.role.toLowerCase().replace(' ', '-');
-      setUserRole(role);
+  //     // Determine role for UI and conditional rendering
+  //     const role = user.role.toLowerCase().replace(' ', '-');
+  //     setUserRole(role);
       
-      setFormData({
-        first_name: user.first_name,
-        middle_name: user.middle_name || "",
-        last_name: user.last_name,
-        email: user.email,
-        access_level: user.access_level,
-        password: "",
-        confirm_password: "",
-        site: user.site_id || "",
-        department: user.department_id || "",
-        role: user.role
-      });
+  //     setFormData({
+  //       first_name: user.first_name,
+  //       middle_name: user.middle_name || "",
+  //       last_name: user.last_name,
+  //       email: user.email,
+  //       access_level: user.access_level,
+  //       password: "",
+  //       confirm_password: "",
+  //       site_id: user.site || "",        // API returns 'site', map to 'site_id'
+  //       department_id: user.department || "", // API returns 'department', map to 'department_id'
+  //       role: user.role
+  //     });
 
-      if (user.site_id) {
-        fetchDepartmentsBySite(user.site_id);
-      }
-    } catch (err) {
-      console.error("Error loading user:", err);
-      alert("Error loading user data");
+  //     if (user.site) {
+  //       fetchDepartmentsBySite(user.site);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error loading user:", err);
+  //     alert("Error loading user data");
       
-      // Redirect to appropriate page based on role
-      if (userRole === "site-admin") navigate('/site-admin');
-      else if (userRole === "dept-admin") navigate('/dept-admin');
-      else navigate('/trainee');
-    } finally {
-      setUserLoading(false);
-    }
-  };
+  //     // Redirect to appropriate page based on role
+  //     if (userRole === "site-admin") navigate('/site-admin');
+  //     else if (userRole === "dept-admin") navigate('/dept-admin');
+  //     else navigate('/trainee');
+  //   }
+  // };
 
   const fetchDepartmentsBySite = (siteId) => {
     if (!siteId) {
@@ -112,9 +117,9 @@ function EditUser() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "site") {
+    if (name === "site_id") {  // Form field is site_id
       fetchDepartmentsBySite(value);
-      setFormData(prev => ({ ...prev, department: "", [name]: value }));
+      setFormData(prev => ({ ...prev, department_id: "", [name]: value }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -143,9 +148,9 @@ function EditUser() {
     };
 
     // Add site/department if applicable
-    if (formData.role === "Dept Admin" || formData.role === "Trainee") {
-      dataToSend.site = formData.site;
-      dataToSend.department = formData.department;
+    if (formData.role === "Trainee") {
+      dataToSend.site = formData.site_id;        // Send as 'site' to match API
+      dataToSend.department = formData.department_id; // Send as 'department' to match API
     }
 
     // Add passwords if provided
@@ -184,14 +189,6 @@ function EditUser() {
     if (formData.role === "Dept Admin") return "Edit Department Admin";
     return "Edit Trainee";
   };
-
-  if (userLoading) {
-    return (
-      <div className="page-container">
-        <div className="loading">Loading user data...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="page-container">
@@ -301,15 +298,15 @@ function EditUser() {
             </div>
           </div>
 
-          {/* Site/Department Fields - Trainee */}
+          {/* Site/Department Fields - Trainee Only */}
           {(formData.role === "Trainee") && (
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="site">Site *</label>
+                <label htmlFor="site_id">Site *</label>
                 <select
-                  id="site"
-                  name="site"
-                  value={formData.site}
+                  id="site_id"
+                  name="site_id"
+                  value={formData.site_id}
                   onChange={handleChange}
                   required
                   className="colored-input"
@@ -321,14 +318,14 @@ function EditUser() {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="department">Department *</label>
+                <label htmlFor="department_id">Department *</label>
                 <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
+                  id="department_id"
+                  name="department_id"
+                  value={formData.department_id}
                   onChange={handleChange}
                   required
-                  disabled={!formData.site}
+                  disabled={!formData.site_id}
                   className="colored-input"
                 >
                   <option value="">-- Select Department --</option>
@@ -362,6 +359,6 @@ function EditUser() {
       </div>
     </div>
   );
-};
+}
 
 export default EditUser;
