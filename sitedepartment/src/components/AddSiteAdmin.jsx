@@ -30,7 +30,10 @@ function AddSiteAdmin() {
       alert("Passwords do not match");
       return;
     }
-
+    if (!formData.access_level) {
+      alert("Access level is required");
+      return;
+    }
     setLoading(true);
 
     try {

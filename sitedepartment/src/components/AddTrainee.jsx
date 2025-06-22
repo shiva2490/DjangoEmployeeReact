@@ -55,6 +55,10 @@ function AddTrainee() {
       return;
     }
 
+    if (!formData.access_level) {
+      alert("Access level is required");
+      return;
+    }
     setLoading(true);
 
     const dataToSend = {
@@ -78,7 +82,7 @@ function AddTrainee() {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
         : "Registration failed";
-      alert(errorMsg);
+      alert("Email alredy exist");
       console.error("Submission error:", err);
     } finally {
       setLoading(false);

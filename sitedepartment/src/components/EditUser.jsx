@@ -19,8 +19,8 @@ function EditUser() {
     access_level: "",
     password: "",
     confirm_password: "",
-    site_id: "",        // Form uses site_id
-    department_id: "",  // Form uses department_id
+    site_id: "",
+    department_id: "",
     role: ""
   });
 
@@ -34,74 +34,35 @@ function EditUser() {
     if (location.state?.user) {
       const user = location.state.user;
       
-    console.log("=== DEBUGGING RECEIVED DATA ===");
-    console.log("Received user:", user);
-    console.log("Looking for site_id:", user.site_id);
-    console.log("Looking for department_id:", user.department_id);
-    console.log("Looking for site:", user.site);
-    console.log("Looking for department:", user.department);
-    console.log("==============================");
+      console.log("=== DEBUGGING RECEIVED DATA ===");
+      console.log("Received user:", user);
+      console.log("Access level value:", user.access_level);
+      console.log("Looking for site_id:", user.site_id);
+      console.log("Looking for department_id:", user.department_id);
+      console.log("Looking for site:", user.site);
+      console.log("Looking for department:", user.department);
+      console.log("==============================");
 
       setUserRole(user.role);
       setFormData({
-        first_name: user.first_name,
+        first_name: user.first_name || "",
         middle_name: user.middle_name || "",
-        last_name: user.last_name,
-        email: user.email,
-        access_level: user.access_level,
+        last_name: user.last_name || "",
+        email: user.email || "",
+        access_level: user.access_level || "", // Ensure this matches the option values
         password: "",
         confirm_password: "",
-        site_id: user.site || "",        // API returns 'site', map to 'site_id'
-        department_id: user.department || "", // API returns 'department', map to 'department_id'
-        role: user.role
+        site_id: user.site || "",
+        department_id: user.department || "",
+        role: user.role || ""
       });
 
       // Load departments if site is selected
       if (user.site) {
         fetchDepartmentsBySite(user.site);
       }
-    } 
-    // else {
-    //   // Fetch user by ID if no state data
-    //   fetchUserById(id);
-    // }
-  }, []); //id, location.state
-
-  // const fetchUserById = async (userId) => {
-  //   try {
-  //     const response = await axios.get(`http://localhost:8000/trainee/api/user/${userId}/`);
-  //     const user = response.data;
-      
-  //     // Determine role for UI and conditional rendering
-  //     const role = user.role.toLowerCase().replace(' ', '-');
-  //     setUserRole(role);
-      
-  //     setFormData({
-  //       first_name: user.first_name,
-  //       middle_name: user.middle_name || "",
-  //       last_name: user.last_name,
-  //       email: user.email,
-  //       access_level: user.access_level,
-  //       password: "",
-  //       confirm_password: "",
-  //       site_id: user.site || "",        // API returns 'site', map to 'site_id'
-  //       department_id: user.department || "", // API returns 'department', map to 'department_id'
-  //       role: user.role
-  //     });
-
-  //     if (user.site) {
-  //       fetchDepartmentsBySite(user.site);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error loading user:", err);
-  //     alert("Error loading user data");
-      
-  //     // Redirect to appropriate page based on role
-  //     if (userRole === "site-admin") navigate('/site-admin');
-  //     else if (userRole === "dept-admin") navigate('/dept-admin');
-  //     else navigate('/trainee');
-  //   }
-  // };
+    }
+  }, []);
 
   const fetchDepartmentsBySite = (siteId) => {
     if (!siteId) {
@@ -117,7 +78,7 @@ function EditUser() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "site_id") {  // Form field is site_id
+    if (name === "site_id") {
       fetchDepartmentsBySite(value);
       setFormData(prev => ({ ...prev, department_id: "", [name]: value }));
     } else {
@@ -127,6 +88,12 @@ function EditUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate access level
+    if (!formData.access_level) {
+      alert("Please select an access level");
+      return;
+    }
     
     // Only validate passwords if at least one is filled
     const isPasswordProvided = formData.password || formData.confirm_password;
@@ -149,8 +116,8 @@ function EditUser() {
 
     // Add site/department if applicable
     if (formData.role === "Trainee") {
-      dataToSend.site = formData.site_id;        // Send as 'site' to match API
-      dataToSend.department = formData.department_id; // Send as 'department' to match API
+      dataToSend.site = formData.site_id;
+      dataToSend.department = formData.department_id;
     }
 
     // Add passwords if provided
@@ -168,10 +135,31 @@ function EditUser() {
       else if (formData.role === "Dept Admin") navigate('/', { state: { show: 'deptAdmin' } });
       else navigate('/', { state: { show: 'trainee' } });
     } catch (err) {
-      const errorMsg = err.response?.data
-        ? JSON.stringify(err.response.data)
-        : "Update failed";
-      alert(errorMsg);
+      console.error("Update error:", err);
+      
+      // Handle different types of errors
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        
+        // Handle validation errors
+        if (typeof errorData === 'object' && !errorData.message) {
+          let errorMessage = "";
+          for (const [field, errors] of Object.entries(errorData)) {
+            if (Array.isArray(errors)) {
+              errorMessage += `${errors.join(', ')}\n`;
+            } else {
+              errorMessage += `${errors}\n`;
+            }
+          }
+          alert(errorMessage.trim());
+        } else if (errorData.message) {
+          alert(errorData.message);
+        } else {
+          alert(errorData);
+        }
+      } else {
+        alert("Update failed: " + (err.message || "Unknown error"));
+      }
     } finally {
       setLoading(false);
     }
@@ -261,6 +249,7 @@ function EditUser() {
                 required
                 className="colored-input"
               >
+                {/* <option value="">-- Select Access Level --</option> */}
                 <option value="Level1">Level 1</option>
                 <option value="Level2">Level 2</option>
                 <option value="Level3">Level 3</option>

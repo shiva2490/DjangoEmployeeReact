@@ -10,6 +10,7 @@ import AddTrainee from './components/AddTrainee';
 import EditUser from './components/EditUser';
 // import AddUser from './components/AddUser';
 import './App.css';
+import AddSiteVedha from './components/AddSiteVedha';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/add-trainee" element={<AddTrainee />} />
           {/* <Route path="/add-user" element={<AddUser />} /> */}
           <Route path="/edit-user/:id" element={<EditUser />} />
+          <Route path="/savesitevedha" element={<AddSiteVedha />} />
         </Routes>
       </div>
     </Router>
