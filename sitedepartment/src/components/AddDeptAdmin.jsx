@@ -14,28 +14,11 @@ function AddDeptAdmin() {
     middle_name: "",
     last_name: "",
     email: "",
-    access_level: "Level 4",
+    access_level: "",
     password: "",
     confirm_password: "",
     role: "Dept Admin"
   });
-
-  // useEffect(() => {
-  //   axios.get("http://localhost:8000/trainee/api/sites/")
-  //     .then(res => setSites(res.data))
-  //     .catch(err => console.error("Error loading sites:", err));
-  // }, []);
-
-  // const fetchDepartmentsBySite = (siteId) => {
-  //   if (!siteId) {
-  //     setDepartments([]);
-  //     return;
-  //   }
-    
-  //   axios.get(`http://localhost:8000/trainee/api/departments/${siteId}/`)
-  //     .then(res => setDepartments(res.data))
-  //     .catch(err => console.error("Error loading departments:", err));
-  // };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,6 +38,10 @@ function AddDeptAdmin() {
       alert("Passwords do not match");
       return;
     }
+    if (formData.password.length < 6){
+      alert("Password required minimum 6 characters");
+      return;
+    }
     if (!formData.access_level) {
       alert("Access level is required");
       return;
@@ -69,7 +56,7 @@ function AddDeptAdmin() {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
         : "Registration failed";
-      alert(errorMsg);
+      alert("Email already exists");
     } finally {
       setLoading(false);
     }
@@ -144,6 +131,7 @@ const handleCancel = () => {
                 onChange={handleChange}
                 required
               >
+                <option>-- Select --</option>
                 <option value="Level1">Level 1</option>
                 <option value="Level2">Level 2</option>
                 <option value="Level3">Level 3</option>

@@ -25,23 +25,12 @@ function EditUser() {
   });
 
   useEffect(() => {
-    // Load sites for Trainee
     axios.get("http://localhost:8000/trainee/api/sites/")
       .then(res => setSites(res.data))
       .catch(err => console.error("Error loading sites:", err));
 
-    // Check if user data was passed in state
     if (location.state?.user) {
       const user = location.state.user;
-      
-      console.log("=== DEBUGGING RECEIVED DATA ===");
-      console.log("Received user:", user);
-      console.log("Access level value:", user.access_level);
-      console.log("Looking for site_id:", user.site_id);
-      console.log("Looking for department_id:", user.department_id);
-      console.log("Looking for site:", user.site);
-      console.log("Looking for department:", user.department);
-      console.log("==============================");
 
       setUserRole(user.role);
       setFormData({
@@ -49,7 +38,7 @@ function EditUser() {
         middle_name: user.middle_name || "",
         last_name: user.last_name || "",
         email: user.email || "",
-        access_level: user.access_level || "", // Ensure this matches the option values
+        access_level: user.access_level || "",
         password: "",
         confirm_password: "",
         site_id: user.site || "",
@@ -57,7 +46,6 @@ function EditUser() {
         role: user.role || ""
       });
 
-      // Load departments if site is selected
       if (user.site) {
         fetchDepartmentsBySite(user.site);
       }
@@ -69,7 +57,6 @@ function EditUser() {
       setDepartments([]);
       return;
     }
-    
     axios.get(`http://localhost:8000/trainee/api/departments/${siteId}/`)
       .then(res => setDepartments(res.data))
       .catch(err => console.error("Error loading departments:", err));
@@ -77,7 +64,6 @@ function EditUser() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "site_id") {
       fetchDepartmentsBySite(value);
       setFormData(prev => ({ ...prev, department_id: "", [name]: value }));
@@ -88,23 +74,27 @@ function EditUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate access level
+
     if (!formData.access_level) {
-      alert("Please select an access level");
+      alert("Select an access level");
       return;
     }
-    
-    // Only validate passwords if at least one is filled
+
     const isPasswordProvided = formData.password || formData.confirm_password;
-    if (isPasswordProvided && formData.password !== formData.confirm_password) {
-      alert("Passwords do not match");
-      return;
+
+    if (isPasswordProvided) {
+      if (formData.password !== formData.confirm_password) {
+        alert("Passwords do not match");
+        return;
+      }
+      if (formData.password.length < 6) {
+        alert("Password required minimum 6 characters");
+        return;
+      }
     }
 
     setLoading(true);
 
-    // Prepare data to send
     const dataToSend = {
       first_name: formData.first_name,
       middle_name: formData.middle_name,
@@ -114,13 +104,11 @@ function EditUser() {
       role: formData.role
     };
 
-    // Add site/department if applicable
     if (formData.role === "Trainee") {
       dataToSend.site = formData.site_id;
       dataToSend.department = formData.department_id;
     }
 
-    // Add passwords if provided
     if (isPasswordProvided) {
       dataToSend.password = formData.password;
       dataToSend.confirm_password = formData.confirm_password;
@@ -129,37 +117,30 @@ function EditUser() {
     try {
       await axios.put(`http://localhost:8000/trainee/api/update/${id}/`, dataToSend);
       alert("User updated successfully!");
-      
-      // Redirect to appropriate table
-      if (formData.role === "Site Admin") navigate('/', { state: { show: 'siteAdmin' } });
-      else if (formData.role === "Dept Admin") navigate('/', { state: { show: 'deptAdmin' } });
-      else navigate('/', { state: { show: 'trainee' } });
+
+      const target = formData.role === "Site Admin" ? 'siteAdmin' : formData.role === "Dept Admin" ? 'deptAdmin' : 'trainee';
+      navigate('/', { state: { show: target } });
+
     } catch (err) {
-      console.error("Update error:", err);
-      
-      // Handle different types of errors
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        // Handle validation errors
-        if (typeof errorData === 'object' && !errorData.message) {
-          let errorMessage = "";
-          for (const [field, errors] of Object.entries(errorData)) {
-            if (Array.isArray(errors)) {
-              errorMessage += `${errors.join(', ')}\n`;
-            } else {
-              errorMessage += `${errors}\n`;
-            }
+      const errorData = err.response?.data;
+      let message = "Update failed";
+
+      if (errorData) {
+        if (typeof errorData === 'string' && errorData.toLowerCase().includes('email')) {
+          message = "Email already exists";
+        } else if (typeof errorData === 'object') {
+          const emailError = errorData.email;
+          if (emailError && Array.isArray(emailError) && emailError.some(e => e.toLowerCase().includes('email'))) {
+            message = "Email already exists";
+          } else {
+            message = Object.values(errorData).flat().join("\n");
           }
-          alert(errorMessage.trim());
-        } else if (errorData.message) {
-          alert(errorData.message);
-        } else {
-          alert(errorData);
         }
       } else {
-        alert("Update failed: " + (err.message || "Unknown error"));
+        message = err.message || message;
       }
+
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -177,8 +158,7 @@ function EditUser() {
     if (formData.role === "Dept Admin") return "Edit Department Admin";
     return "Edit Trainee";
   };
-
-  return (
+return (
     <div className="page-container">
       <div className="page-header">
         <h1>{getTitle()}</h1>

@@ -54,7 +54,10 @@ function AddTrainee() {
       alert("Passwords do not match");
       return;
     }
-
+     if (formData.password.length < 6){
+      alert("Password required minimum 6 characters");
+      return;
+    }
     if (!formData.access_level) {
       alert("Access level is required");
       return;
@@ -82,7 +85,7 @@ function AddTrainee() {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
         : "Registration failed";
-      alert("Email alredy exist");
+      alert("Email already exist");
       console.error("Submission error:", err);
     } finally {
       setLoading(false);

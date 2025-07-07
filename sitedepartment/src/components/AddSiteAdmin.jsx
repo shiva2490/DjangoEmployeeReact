@@ -30,6 +30,10 @@ function AddSiteAdmin() {
       alert("Passwords do not match");
       return;
     }
+     if (formData.password.length < 6){
+      alert("Password required minimum 6 characters");
+      return;
+    }
     if (!formData.access_level) {
       alert("Access level is required");
       return;
@@ -44,7 +48,7 @@ function AddSiteAdmin() {
       const errorMsg = err.response?.data
         ? JSON.stringify(err.response.data)
         : "Registration failed";
-      alert(errorMsg);
+      alert("Email already Exists");
     } finally {
       setLoading(false);
     }
@@ -119,6 +123,7 @@ const handleCancel = () => {
                 onChange={handleChange}
                 required
               >
+                <option >-- select --</option>
                 <option value="Level1">Level 1</option>
                 <option value="Level2">Level 2</option>
                 <option value="Level3">Level 3</option>

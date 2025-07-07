@@ -7,6 +7,8 @@ import './Home.css';
 import SiteAdminTable from './SiteAdminTable';
 import DeptAdminTable from './DeptAdminTable';
 import TraineeTable from './TraineeTable';
+import SiteVedhaTable from './SiteVedhaTable';
+import DeptVedhaTable from './DeptVedhaTable'; // Import the new component
 
 function HomePage() {
   const navigate = useNavigate();
@@ -14,47 +16,21 @@ function HomePage() {
   const location = useLocation();
   const [activeTable, setActiveTable] = useState('users');
 
-useEffect(() => {
-  const tableFromState = location.state?.show;
-  if (tableFromState) {
-    setActiveTable(tableFromState);  // read from navigation state
-  } else {
-    setActiveTable("users");         // default view
-  }
+  useEffect(() => {
+    const tableFromState = location.state?.show;
+    if (tableFromState) {
+      setActiveTable(tableFromState);  // read from navigation state
+    } else {
+      setActiveTable("users");         // default view
+    }
 
-  fetchUsers(); // still fetch all users for All Users table
-}, []);  //location.state
-
-
-// useEffect(() => {
-//   if (location.state?.show) {
-//     setActiveTable(location.state.show);
-//   } else {
-//     setActiveTable('users');
-//   }
-// }, []);
-
-
+    fetchUsers(); // still fetch all users for All Users table
+  }, []);  //location.state
 
   const fetchUsers = () => {
     axios.get("http://localhost:8000/trainee/api/findall/")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error("Error loading users:", err));
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      axios.delete(`http://localhost:8000/trainee/api/delete/${id}/`)
-        .then(() => {
-          alert("User deleted successfully");
-          fetchUsers();
-        })
-        .catch(err => console.error("Delete error:", err));
-    }
-  };
-
-  const handleEdit = (user) => {
-    navigate(`/edit-user/${user.id}`, { state: { user } });
   };
 
   return (
@@ -66,6 +42,8 @@ useEffect(() => {
         <button className="role-btn" onClick={() => setActiveTable('deptAdmin')}>Dept Admin</button>
         <button className="role-btn" onClick={() => setActiveTable('trainee')}>Trainee</button>
         <button className="role-btn" onClick={() => setActiveTable('users')}>All Users</button>
+        <button className="role-btn" onClick={() => setActiveTable('sitevedhatable')}>Sites</button>
+        <button className="role-btn" onClick={() => setActiveTable('deptvedhatable')}>Depts</button>
       </div>
 
       {/* Right - Tables */}
@@ -89,7 +67,6 @@ useEffect(() => {
                     <th>Site</th>
                     <th>Department</th>
                     <th>Role</th>
-                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -104,14 +81,6 @@ useEffect(() => {
                       <td>{user.site_name || "—"}</td>
                       <td>{user.department_name || "—"}</td>
                       <td>{user.role}</td>
-                      <td className="action-cell">
-                        <button className="btn btn-edit" onClick={() => handleEdit(user)}>
-                          Edit
-                        </button>
-                        <button className="btn btn-delete" onClick={() => handleDelete(user.id)}>
-                          Delete
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -130,6 +99,8 @@ useEffect(() => {
         {activeTable === 'siteAdmin' && <SiteAdminTable />}
         {activeTable === 'deptAdmin' && <DeptAdminTable />}
         {activeTable === 'trainee' && <TraineeTable />}
+        {activeTable === 'sitevedhatable' && <SiteVedhaTable/>}
+        {activeTable === 'deptvedhatable' && <DeptVedhaTable/>}
       </div>
     </div>
   );

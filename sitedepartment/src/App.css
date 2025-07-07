@@ -262,17 +262,21 @@ body {
   pointer-events: none;
 }
 
-/* .form-control label span {
-  display: inline-block;
-  font-size: 18px;
-  min-width: 5px;
-  color: #fff;
-  transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+input,
+select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+/*  
+.MuiAutocomplete-root .MuiInputBase-root {
+  background-color: #f8f5f5;
+  color: rgb(17, 14, 14);
+  border-radius: 6px;
+}
+
+.MuiAutocomplete-root label {
+  color: rgb(12, 12, 12);
 } */
 
-/* .form-control input:focus+label span,
-.form-control input:valid+label span {
-  color:#fff;
-  transform: translateY(-30px);
-} */
- 

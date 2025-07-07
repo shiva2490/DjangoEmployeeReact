@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "../App.css";
 
@@ -12,8 +12,10 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-function AddSiteVedha() {
+function EditSiteVedha() {
+  const { id } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     site_name: "",
     location: "",
@@ -33,11 +35,28 @@ function AddSiteVedha() {
   ];
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/trainee/api/site_admin_emails/")
-      .then((res) => setSiteAdmins(res.data))
-      .catch(() => setMessage("Failed to load site admins"));
-  }, []);
+    // Load existing site data - MAKE SURE THIS ENDPOINT MATCHES YOUR BACKEND
+    axios.get(`http://localhost:8000/trainee/api/get_site_vedha/${id}/`)
+      .then((res) => {
+        console.log("Site data loaded:", res.data); // Add this for debugging
+        setFormData(res.data);
+      })
+      .catch((error) => {
+        console.error("Error loading site data:", error); // Add this for debugging
+        setMessage("Failed to load site details");
+      });
+
+    // Load site admins
+    axios.get("http://localhost:8000/trainee/api/site_admin_emails/")
+      .then((res) => {
+        console.log("Sites loaded:", res.data); // Add this for debugging
+        setSiteAdmins(res.data);
+      })
+      .catch((error) => {
+        console.error("Error loading sites :", error); // Add this for debugging
+        setMessage("Failed to load sites ");
+      });
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,61 +65,59 @@ function AddSiteVedha() {
   };
 
   const handleSimulationsChange = (event, value) => {
-    // value is an array of selected simulation objects
     const selected = value.map(item => item.title);
     setFormData((prev) => ({ ...prev, simulations: selected }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.site_name || !formData.location || !formData.site_admin) {
-      setMessage("Site name, location, and site admin are required.");
-      return;
-    }
-
     try {
-      await axios.post("http://localhost:8000/trainee/api/savesitevedha/", formData);
-      setMessage("SiteVedha added successfully!");
-      setTimeout(() => {
-        navigate("/", { state: { show: "sitevedhatable" } });
-      }, 1000);
+      // MAKE SURE THIS ENDPOINT MATCHES YOUR BACKEND
+      await axios.put(`http://localhost:8000/trainee/api/update_sitevedha/${id}/`, formData);
+      setMessage("SiteVedha updated successfully!");
+      setTimeout(() => navigate("/"), 1000);
     } catch (error) {
-      console.error(error);
-      setMessage("Failed to save site.");
+      console.error("Error updating site:", error);
+      setMessage("Failed to update site.");
     }
-  };
-
-  const handleCancel = () => {
-    navigate("/", { state: { show: "sitevedhatable" } });
   };
 
   return (
     <div className="page-container">
       <div className="form-container">
-        <h2>Add Site</h2>
+        <h2>Edit Site</h2>
         {message && <p style={{ color: "red" }}>{message}</p>}
 
         <form onSubmit={handleSubmit}>
-          {/* First Row: Site name and Location */}
+          {/* Row 1 */}
           <div className="form-row">
             <div className="form-group">
               <label>Site Name</label>
-              <input type="text" name="site_name" value={formData.site_name} onChange={handleChange} required />
+              <input
+                type="text"
+                name="site_name"
+                value={formData.site_name}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="form-group">
               <label>Location</label>
-              <input type="text" name="location" value={formData.location} onChange={handleChange} required />
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
-          {/* Second Row: Simulations and Site Admin */}
+          {/* Row 2 */}
           <div className="form-row">
             <div className="form-group">
               <label>Simulations</label>
               <Autocomplete
                 multiple
-                id="simulations-autocomplete"
                 options={simulationOptions}
                 disableCloseOnSelect
                 getOptionLabel={(option) => option.title}
@@ -116,10 +133,10 @@ function AddSiteVedha() {
                     {option.title}
                   </li>
                 )}
-                value={simulationOptions.filter(opt => formData.simulations.includes(opt.title))}
-                renderInput={(params) => (
-                  <TextField {...params}/>
+                value={simulationOptions.filter(opt =>
+                  formData.simulations.includes(opt.title)
                 )}
+                renderInput={(params) => <TextField {...params} />}
               />
             </div>
 
@@ -129,9 +146,8 @@ function AddSiteVedha() {
                 name="site_admin"
                 value={formData.site_admin}
                 onChange={handleChange}
-                required
               >
-                <option value="">-- Select Site Admin --</option>
+                <option value="">-- Select Site --</option>
                 {siteAdmins.map((admin) => (
                   <option key={admin.id} value={admin.id}>
                     {admin.email}
@@ -141,15 +157,15 @@ function AddSiteVedha() {
             </div>
           </div>
 
-          {/* Third Row: Buttons */}
+          {/* Row 3 */}
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
-              Save SiteVedha
+              Update Site
             </button>
             <button
               type="button"
               className="btn btn-cancel"
-              onClick={handleCancel}
+              onClick={() => navigate("/")}
             >
               Cancel
             </button>
@@ -160,4 +176,4 @@ function AddSiteVedha() {
   );
 }
 
-export default AddSiteVedha;
+export default EditSiteVedha;
